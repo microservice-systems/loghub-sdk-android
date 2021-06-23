@@ -1,0 +1,101 @@
+/*
+ * Copyright (C) 2020 Microservice Systems, Inc.
+ * All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:3.5.0"
+    }
+}
+
+plugins {
+    id "com.android.library"
+    id "maven-publish"
+    id "signing"
+}
+
+android {
+    compileSdkVersion 30
+    buildToolsVersion "30.0.3"
+    defaultConfig {
+        minSdkVersion 30
+        targetSdkVersion 30
+    }
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    from javadoc.destinationDir
+    classifier "javadoc"
+}
+
+task sourceJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier "sources"
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = "systems.microservice"
+            artifactId = "loghub-sdk-android"
+            version = "0.0.1-t"
+            artifact(javadocJar)
+            artifact(sourceJar)
+            artifact("$buildDir/outputs/aar/app-release.aar")
+            pom {
+                name = "LogHub SDK for Android"
+                description = "Contains Android classes for integration with LogHub Platform"
+                url = "https://loghub.net/sdk/android"
+                scm {
+                    url = "https://github.com/microservice-systems/loghub-sdk-android.git"
+                }
+                licenses {
+                    license {
+                        name = "Apache License, Version 2.0"
+                        url = "http://www.apache.org/licenses/LICENSE-2.0"
+                        distribution = "repo"
+                    }
+                }
+                developers {
+                    developer {
+                        id = "dmktv"
+                        name = "Dmitry Kotlyarov"
+                        email = "dmktv@microservice.systems"
+                        url = "https://github.com/dmktv"
+                        organization = "Microservice Systems, Inc."
+                        organizationUrl = "https://microservice.systems"
+                        roles = ["architect", "developer"]
+                        timezone = "Europe/Moscow"
+                        properties = [
+                                picUrl: "https://avatars0.githubusercontent.com/u/3524968"
+                        ]
+                    }
+                }
+                properties = [
+                        "project.build.sourceEncoding": "UTF-8"
+                ]
+            }
+        }
+    }
+}
